@@ -1,8 +1,10 @@
 # distributed-db
 A simple, distributed key-value database using Golang.
 ## Dependencies:
-[bbolt](https://github.com/etcd-io/bbolt) \\
-[toml](https://github.com/BurntSushi/toml) \\
+[bbolt](https://github.com/etcd-io/bbolt) 
+\
+[toml](https://github.com/BurntSushi/toml)
+\
 Install all dependencies using
 ```sh
 $ go get
