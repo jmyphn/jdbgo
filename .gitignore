@@ -27,3 +27,5 @@ go.work.sum
 .vscode
 .DS_Store
 .idea
+distributed-db
+databases/*

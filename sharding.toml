@@ -1,0 +1,24 @@
+[[shard]]
+name = "Boston"
+shardID = 0
+address = "localhost:8080"
+
+[[shard]]
+name = "New York"
+shardID = 1
+address = "localhost:8081"
+
+[[shard]]
+name = "Chicago"
+shardID = 2
+address = "localhost:8082"
+
+[[shard]]
+name = "San Francisco"
+shardID = 3
+address = "localhost:8083"
+
+[[shard]]
+name = "Denver"
+shardID = 4
+address = "localhost:8084"
