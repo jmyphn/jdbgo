@@ -1,40 +1,30 @@
-package web
+package server
 
 import (
-	"distributed-db/m/db"
+	"distributed-db/config"
+	"distributed-db/db"
 	"fmt"
-	"hash/fnv"
 	"io"
 	"net/http"
 )
 
 // Server contains HTTP method handlers for the database.
 type Server struct {
-	db         *db.DB
-	shardID    int
-	shardCount int
-	addrs      map[int]string
+	db     *db.DB
+	shards *config.Shards
 }
 
 // NewServer creates a new instance of Server
-func NewServer(db *db.DB, shardCount int, shardID int, addrs map[int]string) *Server {
+func NewServer(db *db.DB, shards *config.Shards) *Server {
 	return &Server{
-		db:         db,
-		shardCount: shardCount,
-		shardID:    shardID,
-		addrs:      addrs,
+		db:     db,
+		shards: shards,
 	}
 }
 
-func (s *Server) getShard(key string) int {
-	h := fnv.New64a()
-	h.Write([]byte(key))
-	return int(h.Sum64() % uint64(s.shardCount))
-}
-
 func (s *Server) redirect(shard int, w http.ResponseWriter, r *http.Request) {
-	url := "http://" + s.addrs[shard] + r.RequestURI
-	fmt.Fprintf(w, "redirecting from shard %d to shard %d (%q)\n", s.shardID, shard, url)
+	url := "http://" + s.shards.Addrs[shard] + r.RequestURI
+	fmt.Fprintf(w, "redirecting from shard %d to shard %d (%q)\n", s.shards.CurID, shard, url)
 	// http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 
 	resp, err := http.Get(url)
@@ -50,12 +40,12 @@ func (s *Server) redirect(shard int, w http.ResponseWriter, r *http.Request) {
 
 // GetHandler handles GET requests to the server.
 func (s *Server) GetHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Called get\n")
+	// fmt.Fprintf(w, "Called get\n")
 	r.ParseForm()
 	key := r.Form.Get("key")
 
-	shard := s.getShard(key)
-	if shard != s.shardID {
+	shard := s.shards.Id(key)
+	if shard != s.shards.CurID {
 		s.redirect(shard, w, r)
 		return
 	}
@@ -63,24 +53,24 @@ func (s *Server) GetHandler(w http.ResponseWriter, r *http.Request) {
 	value, err := s.db.GetKey(key)
 
 	fmt.Fprintf(w, "Shard : %d, ShardID : %d, addr = %q Value : %q, Error: %v\n",
-		shard, s.shardID, s.addrs[shard], value, err)
+		shard, s.shards.CurID, s.shards.Addrs[shard], value, err)
 }
 
 // SetHandler handles PUT requests to the server.
 func (s *Server) SetHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Called set\n")
+	// fmt.Fprintf(w, "Called set\n")
 	r.ParseForm()
 	key := r.Form.Get("key")
 	value := r.Form.Get("value")
 
-	shard := s.getShard(key)
-	if shard != s.shardID {
+	shard := s.shards.Id(key)
+	if shard != s.shards.CurID {
 		s.redirect(shard, w, r)
 		return
 	}
 
 	err := s.db.SetKey(key, []byte(value))
-	fmt.Fprintf(w, "Shard : %d, shardID : %d, Error : %v\n", shard, s.shardID, err)
+	fmt.Fprintf(w, "Shard : %d, shardID : %d, Error : %v\n", shard, s.shards.CurID, err)
 }
 
 // ListenAndServe starts the HTTP server.

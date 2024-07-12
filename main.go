@@ -1,15 +1,13 @@
 package main
 
 import (
-	"distributed-db/m/config"
-	"distributed-db/m/db"
-	"distributed-db/m/web"
+	"distributed-db/config"
+	"distributed-db/db"
+	"distributed-db/server"
 
 	"flag"
 	"log"
 	"net/http"
-
-	"github.com/BurntSushi/toml"
 )
 
 var (
@@ -43,33 +41,15 @@ func parseFlags() {
 func main() {
 	parseFlags()
 
-	var config config.Config
-	if _, err := toml.DecodeFile(*configFile, &config); err != nil {
-		log.Fatalf("Error decoding config file: %v (toml.DecodeFile(%q): %v)",
-			err, *configFile, err)
+	c, err := config.ParseFile(*configFile)
+	if err != nil {
+		log.Fatalf("ParseFile: error parsing file %q: %v", *configFile, err)
 	}
 
-	// DO NOT UNCOMMENT
-	// log.Printf("%#v", config)
-
-	var shardCount int
-	var shardID int = -1
-	var addrs = make(map[int]string)
-
-	shardCount = len(config.Shard)
-	for _, s := range config.Shard {
-		addrs[s.ShardID] = s.Address
-		if s.Name == *shard {
-			shardID = s.ShardID
-		}
+	shards, err := config.ParseShards(c.Shards, *shard)
+	if err != nil {
+		log.Fatalf("ParseShards: %v", err)
 	}
-
-	if shardID < 0 {
-		log.Fatalf("Shard %q not found in config file", *shard)
-	}
-
-	// DO NOT UNCOMMENT
-	// log.Printf("Shard count: %d, Shard ID: %d\n", shardCount, shardID)
 
 	db, close, err := db.NewDB(*dbLocation)
 	if err != nil {
@@ -77,7 +57,7 @@ func main() {
 	}
 	defer close()
 
-	server := web.NewServer(db, shardCount, shardID, addrs)
+	server := server.NewServer(db, shards)
 
 	http.HandleFunc("/get", server.GetHandler)
 	http.HandleFunc("/set", server.SetHandler)

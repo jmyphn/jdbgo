@@ -1,4 +1,4 @@
-module distributed-db/m
+module distributed-db
 
 go 1.22.5
 
