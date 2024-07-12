@@ -13,5 +13,5 @@ $ go get
 ## Usage:
 Run the shell script provided, which will create a directory for the default shards:
 ```sh
-$ bash /launch.sh
+$ bash launch.sh
 ```
