@@ -1,13 +1,31 @@
 package db_test
 
 import (
-	"bytes"
 	"distributed-db/db"
 	"os"
 	"testing"
 )
 
-func TestGetSet(t *testing.T) {
+func setKey(t *testing.T, db *db.DB, key string, value string) {
+	t.Helper()
+
+	if err := db.SetKey(key, []byte(value)); err != nil {
+		t.Fatalf("SetKey(%q, %q): failed to set key %q: %v", key, value, key, err)
+	}
+}
+
+func getKey(t *testing.T, db *db.DB, key string) string {
+	t.Helper()
+
+	val, err := db.GetKey(key)
+	if err != nil {
+		t.Fatalf("GetKey(%q): failed to get key %q: %v", key, key, err)
+	}
+
+	return string(val)
+}
+
+func TestDeleteExtraKeys(t *testing.T) {
 	f, err := os.CreateTemp(os.TempDir(), "dbtest")
 	if err != nil {
 		t.Fatalf("Could not create a temp file: %v", err)
@@ -22,16 +40,22 @@ func TestGetSet(t *testing.T) {
 	}
 	defer closeFunc()
 
-	if err = db.SetKey("a", []byte("b")); err != nil {
-		t.Fatalf("SetKey: Could not set key: %v", err)
+	setKey(t, db, "a", "b")
+	setKey(t, db, "b", "c")
+
+	if err := db.DeleteExtraKeys(func(name string) bool {
+		return name == "b"
+	}); err != nil {
+		t.Fatalf("Could not delete extra keys: %v", err)
 	}
 
-	val, err := db.GetKey("a")
-	if err != nil {
-		t.Fatalf("GetKey: Could not get key: %v", err)
+	if value := getKey(t, db, "a"); value != "b" {
+		t.Errorf("Unexpected value for key 'a' after deleting extra keys: "+
+			"got %q, want %q", value, "b")
 	}
 
-	if !bytes.Equal(val, []byte("b")) {
-		t.Errorf("Unexpected value for key 'a': got %q, want %q", val, "b")
+	if value := getKey(t, db, "b"); value != "" {
+		t.Errorf("Unexpected value for key 'b' after deleting extra keys: "+
+			"got %q, want %q", value, "")
 	}
 }

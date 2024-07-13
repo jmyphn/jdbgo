@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# trap 'killall distributed-db' SIGINT
+trap 'killall distributed-db' SIGINT
 
 cd $(dirname $0)
 
@@ -16,5 +16,8 @@ mkdir -p databases || true
 ./distributed-db -db-location=databases/chicago.db -http-address=127.0.0.1:8082 -configFile=sharding.toml -shard='Chicago' &
 ./distributed-db -db-location=databases/san_francisco.db -http-address=127.0.0.1:8083 -configFile=sharding.toml -shard='San Francisco' &
 ./distributed-db -db-location=databases/denver.db -http-address=127.0.0.1:8084 -configFile=sharding.toml -shard='Denver' &
+./distributed-db -db-location=databases/seattle.db -http-address=127.0.0.1:8085 -configFile=sharding.toml -shard='Seattle' &
+./distributed-db -db-location=databases/los_angeles.db -http-address=127.0.0.1:8086 -configFile=sharding.toml -shard='Los Angeles' &
+./distributed-db -db-location=databases/miami.db -http-address=127.0.0.1:8087 -configFile=sharding.toml -shard='Miami'
 
 wait

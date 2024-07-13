@@ -12,8 +12,8 @@ import (
 
 var (
 	dbLocation  = flag.String("db-location", "", "Path to database")
-	httpAddress = flag.String("http-address", "127.0.0.1:8080", "HTTP host and port")
-	configFile  = flag.String("configFile", "sharding.toml", "Config file for static sharding")
+	httpAddress = flag.String("http-address", "", "HTTP host and port")
+	configFile  = flag.String("configFile", "", "Config file for static sharding")
 	shard       = flag.String("shard", "", "Shard name to use")
 )
 
@@ -61,6 +61,7 @@ func main() {
 
 	http.HandleFunc("/get", server.GetHandler)
 	http.HandleFunc("/set", server.SetHandler)
+	http.HandleFunc("/purge", server.DeleteExtraKeysHandler)
 
 	log.Fatal(server.ListenAndServe(httpAddress))
 }

@@ -77,3 +77,10 @@ func (s *Server) SetHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) ListenAndServe(httpAddress *string) error {
 	return http.ListenAndServe(*httpAddress, nil)
 }
+
+// DeleteExtraKeysHandler deletes all keys that do not belong to the current shard.
+func (s *Server) DeleteExtraKeysHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Error: %v\n", s.db.DeleteExtraKeys(func(key string) bool {
+		return s.shards.Id(key) != s.shards.CurID
+	}))
+}

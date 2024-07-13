@@ -22,3 +22,18 @@ address = "localhost:8083"
 name = "Denver"
 shardID = 4
 address = "localhost:8084"
+
+[[shards]]
+name = "Seattle"
+shardID = 5
+address = "localhost:8085"
+
+[[shards]]
+name = "Los Angeles"
+shardID = 6
+address = "localhost:8086"
+
+[[shards]]
+name = "Miami"
+shardID = 7
+address = "localhost:8087"
