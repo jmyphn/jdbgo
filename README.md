@@ -5,6 +5,7 @@ A simple, distributed key-value database using Golang.
 \
 [toml](https://github.com/BurntSushi/toml)
 \
+[stats](https://github.com/montanaflynn/stats)
 Install all dependencies using
 ```sh
 $ go get
