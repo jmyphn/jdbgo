@@ -29,7 +29,6 @@ func (s *Server) redirect(shard int, w http.ResponseWriter, r *http.Request) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		w.WriteHeader(500)
 		fmt.Fprintf(w, "Error redirecting the request: %v\n", err)
 		return
 	}

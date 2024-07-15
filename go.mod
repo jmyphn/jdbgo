@@ -7,4 +7,7 @@ require (
 	go.etcd.io/bbolt v1.3.10
 )
 
-require golang.org/x/sys v0.22.0 // indirect
+require (
+	github.com/montanaflynn/stats v0.7.1 // indirect
+	golang.org/x/sys v0.22.0 // indirect
+)
