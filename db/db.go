@@ -20,6 +20,8 @@ func NewDB(dbPath string) (db *DB, closeFunc func() error, err error) {
 		return nil, nil, err
 	}
 
+	//	boltDB.NoSync = true
+
 	db = &DB{db: boltDB}
 	closeFunc = boltDB.Close
 
