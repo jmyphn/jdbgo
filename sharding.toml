@@ -1,39 +1,43 @@
 [[shards]]
 name = "Boston"
 shardID = 0
-address = "localhost:8080"
+address = "127.0.0.1:8080"
+replicas = ["127.0.0.1:8081"]
 
 [[shards]]
 name = "New York"
 shardID = 1
-address = "localhost:8081"
+address = "127.0.0.1:8082"
+replicas = ["127.0.0.12:8083"]
 
 [[shards]]
 name = "Chicago"
 shardID = 2
-address = "localhost:8082"
+address = "127.0.0.1:8084"
+replicas = ["127.0.0.13:8085"]
 
 [[shards]]
 name = "San Francisco"
 shardID = 3
-address = "localhost:8083"
+address = "127.0.0.1:8086"
+replicas = ["127.0.0.14:8087"]
 
-[[shards]]
-name = "Denver"
-shardID = 4
-address = "localhost:8084"
+# [[shards]]
+# name = "Denver"
+# shardID = 4
+# address = "localhost:8084"
 
-[[shards]]
-name = "Seattle"
-shardID = 5
-address = "localhost:8085"
+# [[shards]]
+# name = "Seattle"
+# shardID = 5
+# address = "localhost:8085"
 
-[[shards]]
-name = "Los Angeles"
-shardID = 6
-address = "localhost:8086"
+# [[shards]]
+# name = "Los Angeles"
+# shardID = 6
+# address = "localhost:8086"
 
-[[shards]]
-name = "Miami"
-shardID = 7
-address = "localhost:8087"
+# [[shards]]
+# name = "Miami"
+# shardID = 7
+# address = "localhost:8087"

@@ -3,6 +3,7 @@ package main
 import (
 	"distributed-db/config"
 	"distributed-db/db"
+	"distributed-db/replication"
 	"distributed-db/server"
 
 	"flag"
@@ -15,6 +16,7 @@ var (
 	httpAddress = flag.String("http-address", "", "HTTP host and port")
 	configFile  = flag.String("configFile", "", "Config file for static sharding")
 	shard       = flag.String("shard", "", "Shard name to use")
+	replica     = flag.Bool("replica", false, "Whether this server is a read-only replica")
 )
 
 func parseFlags() {
@@ -51,17 +53,28 @@ func main() {
 		log.Fatalf("ParseShards: %v", err)
 	}
 
-	db, close, err := db.NewDB(*dbLocation)
+	db, close, err := db.NewDB(*dbLocation, *replica)
 	if err != nil {
 		log.Fatalf("NewDB(%q): %v", *dbLocation, err) // TODO: exposes db location
 	}
 	defer close()
+
+	// TODO: add replication package
+	if *replica {
+		addr, ok := shards.Addrs[shards.CurID]
+		if !ok {
+			log.Fatalf("Could not find a main address for shard %d", shards.CurID)
+		}
+		go replication.ClientLoop(db, addr)
+	}
 
 	server := server.NewServer(db, shards)
 
 	http.HandleFunc("/get", server.GetHandler)
 	http.HandleFunc("/set", server.SetHandler)
 	http.HandleFunc("/purge", server.DeleteExtraKeysHandler)
+	http.HandleFunc("/next-replication-key", server.GetNextKeyForReplication)
+	http.HandleFunc("/delete-replication-key", server.DeleteReplicationKey)
 
 	log.Fatal(server.ListenAndServe(httpAddress))
 }

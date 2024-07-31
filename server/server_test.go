@@ -25,7 +25,7 @@ func createShardDB(t *testing.T, id int) *db.DB {
 	name := tmp.Name()
 	tmp.Close()
 
-	db, closeFunc, err := db.NewDB(name)
+	db, closeFunc, err := db.NewDB(name, false)
 	if err != nil {
 		t.Fatalf("NewDB: Could not create a new database: %v", err)
 	}
