@@ -1,4 +1,4 @@
-# distributed-db
+# jdbgo
 A simple, distributed key-value database using Golang.
 ## Dependencies:
 [bbolt](https://github.com/etcd-io/bbolt) 
